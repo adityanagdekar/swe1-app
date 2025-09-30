@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Todo List</title>
+</head>
+
+<body>
+    <h1>Todo List</h1>
+
+    <a href="{% url 'polls:add_task' %}">Add a new task</a>
+    <ul>
+        {% for task in tasks %}
+        <li>
+            {{ task.title }} -
+            <a href="{% url 'polls:complete_task' task.id %}">Mark complete</a>
+            <p>{{ task.description }}</p>
+        </li>
+        {% empty %}
+        <p>No tasks yet.</p>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
