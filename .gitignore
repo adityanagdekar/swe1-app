@@ -6,7 +6,6 @@ __pycache__/
 myenv/
 
 # Django stuff
-db.sqlite3
 /static/
 
 # OS
