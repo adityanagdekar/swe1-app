@@ -25,6 +25,7 @@ Usage:
         python ./scripts/ebcli_installer.py --help
 
 """
+
 import argparse
 import os
 import subprocess
@@ -35,42 +36,38 @@ if sys.version_info < (3, 0):
     input = raw_input
 
 
-EBCLI_INSTALLER_STAMP = '.ebcli_installer_stamp'
+EBCLI_INSTALLER_STAMP = ".ebcli_installer_stamp"
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-with open(os.path.join(PROJECT_ROOT, 'VERSION')) as version_file:
+with open(os.path.join(PROJECT_ROOT, "VERSION")) as version_file:
     EBCLI_INSTALLER_VERSION = version_file.read().strip()
 
 
 EXECUTABLE_WRAPPERS = {
-    'bat': '\n'.join(
+    "bat": "\n".join(
         [
-            '@echo off',
-            'REM Safe way to consolidate CMD line arguments to pass to `eb`',
-            'set args=%1',
-            'shift',
-            ':start',
-            'if [%1] == [] goto done',
-            'set args=%args% %1',
-            'shift',
-            'goto start',
-            ':done',
-            '',
-            'REM activate virtualenv, call eb and deactivate virtualenv',
-            'CALL {bin_location}\\activate.bat',
-            '@start CALL {bin_location}\\eb.exe %args%',
-            '@echo off',
-            'deactivate'
+            "@echo off",
+            "REM Safe way to consolidate CMD line arguments to pass to `eb`",
+            "set args=%1",
+            "shift",
+            ":start",
+            "if [%1] == [] goto done",
+            "set args=%args% %1",
+            "shift",
+            "goto start",
+            ":done",
+            "",
+            "REM activate virtualenv, call eb and deactivate virtualenv",
+            "CALL {bin_location}\\activate.bat",
+            "@start CALL {bin_location}\\eb.exe %args%",
+            "@echo off",
+            "deactivate",
         ]
     ),
-    'ps1': '\n'.join(
-        [
-            '{bin_location}\\activate.ps1',
-            '{bin_location}\\eb $args',
-            'deactivate'
-        ]
+    "ps1": "\n".join(
+        ["{bin_location}\\activate.ps1", "{bin_location}\\eb $args", "deactivate"]
     ),
-    'py': """#!/usr/bin/env python
+    "py": """#!/usr/bin/env python
 import subprocess
 import sys
 
@@ -115,28 +112,28 @@ else:
     exec(open(activate_this).read(), dict(__file__=activate_this))
 
 exit(_exec_cmd(['{bin_location}/eb'] + sys.argv[1:]))
-"""
+""",
 }
 
 
 PATH_EXPORTER_SCRIPTS = {
-    'bat': 'WSCript {path_exporter_script}\n',
-    'vbs': '\n'.join(
+    "bat": "WSCript {path_exporter_script}\n",
+    "vbs": "\n".join(
         [
             'Set wshShell = CreateObject( "WScript.Shell" )',
             'Set wshUserEnv = wshShell.Environment( "USER" )',
-            'Dim pathVar',
+            "Dim pathVar",
             'pathVar = wshUserEnv( "Path" )',
-            '',
+            "",
             'If InStr(pathVar, "{new_location}") = 0 Then',
             'wshUserEnv( "Path" ) = wshUserEnv( "Path" ) + ";{new_location}"',
-            'End If',
-            '',
-            'Set wshUserEnv = Nothing',
-            'Set wshShell   = Nothing',
-            '',
+            "End If",
+            "",
+            "Set wshUserEnv = Nothing",
+            "Set wshShell   = Nothing",
+            "",
         ]
-    )
+    ),
 }
 
 
@@ -176,23 +173,23 @@ EBCLI has been installed.
 """
 
 
-PIP_AND_VIRTUALENV_NOT_FOUND = ' '.join(
+PIP_AND_VIRTUALENV_NOT_FOUND = " ".join(
     [
         'ERROR: Could not find "pip" and "virtualenv" installed.'
         'Ensure "pip" and "virtualenv" are installed and that they'
-        'are in PATH before executing this script.'
+        "are in PATH before executing this script."
     ]
 )
 
 
-VIRTUALENV_DIR_NAME = '.ebcli-virtual-env'
+VIRTUALENV_DIR_NAME = ".ebcli-virtual-env"
 
 
-VIRTUALENV_NOT_FOUND = ' '.join(
+VIRTUALENV_NOT_FOUND = " ".join(
     [
         'ERROR: Could not find and "virtualenv" installed. Ensure'
-        'virtualenv is installed and that it is in PATH before executing'
-        'this script.'
+        "virtualenv is installed and that it is in PATH before executing"
+        "this script."
     ]
 )
 
@@ -215,6 +212,7 @@ class Step(object):
     Class labels an installation Step and is expected to be invoked as
     the decorator of Step functions.
     """
+
     Step_number = 1
 
     def __init__(self, title):
@@ -222,17 +220,18 @@ class Step(object):
 
     def __call__(self, func):
         def wrapped(*args):
-            title = '{0}. {1}'.format(Step.Step_number, self.title)
-            marker = '*' * len(title)
-            print('\n{0}\n{1}\n{0}'.format(marker, title))
+            title = "{0}. {1}".format(Step.Step_number, self.title)
+            marker = "*" * len(title)
+            print("\n{0}\n{1}\n{0}".format(marker, title))
             return_value = func(*args)
             Step.Step_number += 1
 
             return return_value
+
         return wrapped
 
 
-@Step('Activating virtualenv')
+@Step("Activating virtualenv")
 def _activate_virtualenv(virtualenv_location):
     """
     Function activates virtualenv, ".ebcli-virtual-env", created apriori for the
@@ -242,16 +241,16 @@ def _activate_virtualenv(virtualenv_location):
                           created by this script.
     :return None
     """
-    if sys.platform.startswith('win32'):
-        activate_script_directory = 'Scripts'
+    if sys.platform.startswith("win32"):
+        activate_script_directory = "Scripts"
     else:
-        activate_script_directory = 'bin'
+        activate_script_directory = "bin"
 
     activate_this_path = os.path.join(
         virtualenv_location,
         VIRTUALENV_DIR_NAME,
         activate_script_directory,
-        'activate_this.py'
+        "activate_this.py",
     )
 
     if sys.version_info < (3, 0):
@@ -260,7 +259,7 @@ def _activate_virtualenv(virtualenv_location):
         exec(open(activate_this_path).read(), dict(__file__=activate_this_path))
 
 
-@Step('Finishing up')
+@Step("Finishing up")
 def _announce_success(virtualenv_location, hide_export_recommendation):
     """
     Function checks whether the installation location is already in PATH.
@@ -293,46 +292,43 @@ def _announce_success(virtualenv_location, hide_export_recommendation):
     """
     new_location = _eb_wrapper_location(virtualenv_location)
 
-    if new_location in os.environ['PATH']:
+    if new_location in os.environ["PATH"]:
         content = MINIMAL_INSTALLATION_SUCCESS_MESSAGE.format(
-            path=new_location,
-            new_eb_path=os.path.join(new_location, 'eb')
+            path=new_location, new_eb_path=os.path.join(new_location, "eb")
         )
 
         _print_success_message(content)
     else:
-        path_exporter = os.path.join(new_location, 'path_exporter.vbs')
-        path_exporter_wrapper = os.path.join(new_location, 'path_exporter.bat')
-        if sys.platform.startswith('win32'):
-            with open(path_exporter, 'w') as file:
+        path_exporter = os.path.join(new_location, "path_exporter.vbs")
+        path_exporter_wrapper = os.path.join(new_location, "path_exporter.bat")
+        if sys.platform.startswith("win32"):
+            with open(path_exporter, "w") as file:
                 file.write(
-                    PATH_EXPORTER_SCRIPTS['vbs'].format(
-                        new_location=new_location
-                    )
+                    PATH_EXPORTER_SCRIPTS["vbs"].format(new_location=new_location)
                 )
 
-            with open(path_exporter_wrapper, 'w') as file:
+            with open(path_exporter_wrapper, "w") as file:
                 file.write(
-                    PATH_EXPORTER_SCRIPTS['bat'].format(
+                    PATH_EXPORTER_SCRIPTS["bat"].format(
                         path_exporter_script=path_exporter
                     )
                 )
 
-                _print_success_message('Success!')
+                _print_success_message("Success!")
 
                 if not hide_export_recommendation:
                     _print_recommendation_message(
-                        INSTALLATION_SUCCESS_MESSAGE_WITH_EXPORT_RECOMMENDATION__WINDOWS
-                            .format(
+                        INSTALLATION_SUCCESS_MESSAGE_WITH_EXPORT_RECOMMENDATION__WINDOWS.format(
                             path_exporter_bat=path_exporter_wrapper,
-                            path_exporter=path_exporter
+                            path_exporter=path_exporter,
                         )
                     )
         else:
-            _print_success_message('Success!')
+            _print_success_message("Success!")
             _print_recommendation_message(
-                INSTALLATION_SUCCESS_MESSAGE_WITH_EXPORT_RECOMMENDATION__NON_WINDOWS
-                    .format(eb_location=new_location)
+                INSTALLATION_SUCCESS_MESSAGE_WITH_EXPORT_RECOMMENDATION__NON_WINDOWS.format(
+                    eb_location=new_location
+                )
             )
 
 
@@ -351,8 +347,9 @@ def _print_in_foreground(message, color_number):
                          a color
     :return: None
     """
-    if sys.platform.startswith('win32'):
+    if sys.platform.startswith("win32"):
         import colorama
+
         colorama.init()
         if color_number == GREEN_COLOR_CODE:
             print(colorama.Fore.GREEN + message)
@@ -373,6 +370,7 @@ def _print_in_foreground(message, color_number):
             )
         )
 
+
 def _print_recommendation_message(message):
     _print_in_foreground(message, YELLOW_COLOR_CODE)
 
@@ -385,12 +383,9 @@ def _print_error_message(message):
     _print_in_foreground(message, RED_COLOR_CODE)
 
 
-@Step('Creating exclusive virtualenv for EBCLI')
+@Step("Creating exclusive virtualenv for EBCLI")
 def _create_virtualenv(
-        virtualenv_executable,
-        virtualenv_location,
-        python_installation,
-        quiet
+    virtualenv_executable, virtualenv_location, python_installation, quiet
 ):
     """
     Function creates a new virtualenv at path `virtualenv_location`
@@ -430,31 +425,30 @@ def _create_virtualenv(
     virtualenv_directory = os.path.join(virtualenv_location, VIRTUALENV_DIR_NAME)
     python_installation = python_installation or sys.executable
 
-    if (
-        os.path.exists(virtualenv_directory)
-        and not _directory_was_created_by_installer(virtualenv_directory)
+    if os.path.exists(virtualenv_directory) and not _directory_was_created_by_installer(
+        virtualenv_directory
     ):
         _error(
             'Installation cannot proceed because "{virtualenv_location}" already exists '
-                'but was not created by this EBCLI installer.'
-            '\n'
-            '\n'
-            'You can either:\n'
-            '\n'
+            "but was not created by this EBCLI installer."
+            "\n"
+            "\n"
+            "You can either:\n"
+            "\n"
             '1. Delete "{virtualenv_location}" after verifying you don\'t need it; OR\n'
-            '2. Specify an alternate location to install the EBCLI and its artifacts in '
-                'using the `--location` argument of this script .\n'.format(
+            "2. Specify an alternate location to install the EBCLI and its artifacts in "
+            "using the `--location` argument of this script .\n".format(
                 virtualenv_location=virtualenv_directory
             )
         )
 
     virtualenv_args = [
-        virtualenv_executable or 'virtualenv',
-        '"{}"'.format(virtualenv_directory)
+        virtualenv_executable or "virtualenv",
+        '"{}"'.format(virtualenv_directory),
     ]
 
     python_installation and virtualenv_args.extend(
-        ['-p', '"{}"'.format(python_installation)]
+        ["-p", '"{}"'.format(python_installation)]
     )
 
     if _exec_cmd(virtualenv_args, quiet) != 0:
@@ -465,7 +459,7 @@ def _create_virtualenv(
     return virtualenv_location
 
 
-@Step('Locating virtualenv installation')
+@Step("Locating virtualenv installation")
 def _locate_virtualenv_executable():
     """
     Function attempts to find the location at which `virtualenv` is installed.
@@ -479,10 +473,10 @@ def _locate_virtualenv_executable():
     :side-effect: script will exit with a non-0 return code if a
                   virtualenv and/or pip executables haven't been found.
     """
-    virtualenv_executables = ['virtualenv']
+    virtualenv_executables = ["virtualenv"]
 
-    if sys.platform.startswith('win32'):
-        virtualenv_executables += ['virtualenv.cmd', 'virtualenv.exe']
+    if sys.platform.startswith("win32"):
+        virtualenv_executables += ["virtualenv.cmd", "virtualenv.exe"]
     virtualenv_executable = None
     for _virtualenv_executable in virtualenv_executables:
         if _executable_found(_virtualenv_executable, True):
@@ -497,7 +491,7 @@ def _locate_virtualenv_executable():
     return virtualenv_executable
 
 
-@Step('Creating EB wrappers')
+@Step("Creating EB wrappers")
 def _generate_ebcli_wrappers(virtualenv_location):
     """
     Function generates:
@@ -515,23 +509,23 @@ def _generate_ebcli_wrappers(virtualenv_location):
     executables_dir = _eb_wrapper_location(virtualenv_location)
     not os.path.exists(executables_dir) and os.mkdir(executables_dir)
 
-    ebcli_script_path = os.path.join(executables_dir, 'eb')
-    ebcli_ps1_script_path = os.path.join(executables_dir, 'eb.ps1')
-    ebcli_bat_script_path = os.path.join(executables_dir, 'eb.bat')
+    ebcli_script_path = os.path.join(executables_dir, "eb")
+    ebcli_ps1_script_path = os.path.join(executables_dir, "eb.ps1")
+    ebcli_bat_script_path = os.path.join(executables_dir, "eb.bat")
 
-    if sys.platform.startswith('win32'):
-        with open(ebcli_ps1_script_path, 'w') as script:
+    if sys.platform.startswith("win32"):
+        with open(ebcli_ps1_script_path, "w") as script:
             script.write(_powershell_script_body(virtualenv_location))
 
-        with open(ebcli_bat_script_path, 'w') as script:
+        with open(ebcli_bat_script_path, "w") as script:
             script.write(_bat_script_body(virtualenv_location))
     else:
-        with open(ebcli_script_path, 'w') as script:
+        with open(ebcli_script_path, "w") as script:
             script.write(_python_script_body(virtualenv_location))
-        _exec_cmd(['chmod', '+x', ebcli_script_path], False)
+        _exec_cmd(["chmod", "+x", ebcli_script_path], False)
 
 
-@Step('Installing EBCLI')
+@Step("Installing EBCLI")
 def _install_ebcli(quiet, version, ebcli_source):
     """
     Function installs the awsebcli presumably within the virtualenv,
@@ -547,14 +541,17 @@ def _install_ebcli(quiet, version, ebcli_source):
     :return None
     """
     if ebcli_source:
-        install_args = ['pip', 'install', '{}'.format(ebcli_source.strip())]
+        install_args = ["pip", "install", "{}".format(ebcli_source.strip())]
     elif version:
-        install_args = ['pip', 'install', 'awsebcli=={}'.format(version.strip())]
+        install_args = ["pip", "install", "awsebcli=={}".format(version.strip())]
     else:
         install_args = [
-            'pip', 'install', 'awsebcli',
-            '--upgrade',
-            '--upgrade-strategy', 'eager',
+            "pip",
+            "install",
+            "awsebcli",
+            "--upgrade",
+            "--upgrade-strategy",
+            "eager",
         ]
     returncode = _exec_cmd(install_args, quiet)
 
@@ -572,14 +569,8 @@ def _add_ebcli_stamp(virtualenv_directory):
     will be installed
     :return: None
     """
-    with open(
-        os.path.join(
-            virtualenv_directory,
-            EBCLI_INSTALLER_STAMP
-        ),
-        'w'
-    ) as file:
-        file.write('\n')
+    with open(os.path.join(virtualenv_directory, EBCLI_INSTALLER_STAMP), "w") as file:
+        file.write("\n")
 
 
 def _bat_script_body(virtualenv_location):
@@ -592,7 +583,7 @@ def _bat_script_body(virtualenv_location):
                           created.
     :return: None
     """
-    return EXECUTABLE_WRAPPERS['bat'].format(
+    return EXECUTABLE_WRAPPERS["bat"].format(
         bin_location=_original_eb_location(virtualenv_location)
     )
 
@@ -607,12 +598,7 @@ def _directory_was_created_by_installer(virtualenv_directory):
     :return: Boolean indicating whether `virtualenv_directory` was created
              by this script or not.
     """
-    return os.path.exists(
-        os.path.join(
-            virtualenv_directory,
-            EBCLI_INSTALLER_STAMP
-        )
-    )
+    return os.path.exists(os.path.join(virtualenv_directory, EBCLI_INSTALLER_STAMP))
 
 
 def _eb_wrapper_location(virtualenv_location):
@@ -627,9 +613,7 @@ def _eb_wrapper_location(virtualenv_location):
              the wrapper of the `eb` executable should be installed.
     """
     return os.path.join(
-        os.path.abspath(virtualenv_location),
-        VIRTUALENV_DIR_NAME,
-        'executables'
+        os.path.abspath(virtualenv_location), VIRTUALENV_DIR_NAME, "executables"
     )
 
 
@@ -653,12 +637,12 @@ def _ensure_not_inside_virtualenv_to_begin_with():
     :side-effect: script will exit with a non-0 return code if a
                   virtualenv has already been activated within the shell.
     """
-    if os.environ.get('VIRTUAL_ENV'):
-        _error('This script cannot be executed inside a virtual environment.')
+    if os.environ.get("VIRTUAL_ENV"):
+        _error("This script cannot be executed inside a virtual environment.")
 
 
 def _error(message):
-    _print_error_message('ERROR: {}'.format(message))
+    _print_error_message("ERROR: {}".format(message))
     exit(1)
 
 
@@ -673,12 +657,7 @@ def _exec_cmd(args, quiet):
     :return: the return code of the subprocess
     """
     stdout = subprocess.PIPE if quiet else None
-    p = subprocess.Popen(
-        ' '.join(args),
-        stdout=stdout,
-        stderr=stdout,
-        shell=True
-    )
+    p = subprocess.Popen(" ".join(args), stdout=stdout, stderr=stdout, shell=True)
 
     p.communicate()
 
@@ -692,7 +671,7 @@ def _executable_found(executable, quiet):
     :param executable: The executable to find on the computer
     :return: True/False
     """
-    return _exec_cmd([executable, '--version'], quiet) == 0
+    return _exec_cmd([executable, "--version"], quiet) == 0
 
 
 def _user_local_directory():
@@ -703,14 +682,14 @@ def _user_local_directory():
     determined, execution will continue normally.
     :return: the home of the current user
     """
-    if sys.platform.startswith('win32'):
+    if sys.platform.startswith("win32"):
         identified_location = (
-            os.environ.get('USERPROFILE')
-            or os.environ.get('LOCALAPPDATA')
-            or os.environ.get('APPDATA')
+            os.environ.get("USERPROFILE")
+            or os.environ.get("LOCALAPPDATA")
+            or os.environ.get("APPDATA")
         )
     else:
-        identified_location = os.environ.get('HOME')
+        identified_location = os.environ.get("HOME")
 
     if not identified_location:
         _error(
@@ -731,15 +710,13 @@ def _original_eb_location(virtualenv_location):
     :return: the location of the directory within the virtualenv where
              the original `eb` executable is expected to be found
     """
-    if sys.platform.startswith('win32'):
-        scripts_directory = 'Scripts'
+    if sys.platform.startswith("win32"):
+        scripts_directory = "Scripts"
     else:
-        scripts_directory = 'bin'
+        scripts_directory = "bin"
 
     return os.path.join(
-        os.path.abspath(virtualenv_location),
-        VIRTUALENV_DIR_NAME,
-        scripts_directory
+        os.path.abspath(virtualenv_location), VIRTUALENV_DIR_NAME, scripts_directory
     )
 
 
@@ -752,51 +729,54 @@ def _parse_arguments():
              arguments passed by the user.
     """
     parser = argparse.ArgumentParser(
-        description='EBCLI installer {}\n\n'
-                    'This program creates an isolated virtualenv solely meant for invoking '
-                    '`eb` within.'.format(EBCLI_INSTALLER_VERSION),
-        usage='python {file_name} [optional arguments]'.format(file_name=__file__),
-        formatter_class=argparse.RawTextHelpFormatter
+        description="EBCLI installer {}\n\n"
+        "This program creates an isolated virtualenv solely meant for invoking "
+        "`eb` within.".format(EBCLI_INSTALLER_VERSION),
+        usage="python {file_name} [optional arguments]".format(file_name=__file__),
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
-        '-e', '--virtualenv-executable',
-        help="path to the virtualenv installation to use to create the EBCLI's virtualenv"
+        "-e",
+        "--virtualenv-executable",
+        help="path to the virtualenv installation to use to create the EBCLI's virtualenv",
     )
     parser.add_argument(
-        '-i', '--hide-export-recommendation',
-        action='store_true',
-        help="boolean to hide recommendation to modify PATH"
+        "-i",
+        "--hide-export-recommendation",
+        action="store_true",
+        help="boolean to hide recommendation to modify PATH",
     )
     parser.add_argument(
-        '-l', '--location',
-        help='location to store the awsebcli packages and its dependencies in'
+        "-l",
+        "--location",
+        help="location to store the awsebcli packages and its dependencies in",
     )
     parser.add_argument(
-        '-p', '--python-installation',
-        help='path to the python installation under which to install the '
-             'awsebcli and its \ndependencies'
+        "-p",
+        "--python-installation",
+        help="path to the python installation under which to install the "
+        "awsebcli and its \ndependencies",
     )
     parser.add_argument(
-        '-q', '--quiet',
-        action='store_true',
-        help='enable quiet mode to display only minimal, necessary output'
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="enable quiet mode to display only minimal, necessary output",
     )
     parser.add_argument(
-        '-s', '--ebcli-source',
-        help='filesystem path to a Git repository of the EBCLI, or a .zip or .tar file of \n'
-             'the EBCLI source code; useful when testing a development version of the EBCLI.'
+        "-s",
+        "--ebcli-source",
+        help="filesystem path to a Git repository of the EBCLI, or a .zip or .tar file of \n"
+        "the EBCLI source code; useful when testing a development version of the EBCLI.",
     )
-    parser.add_argument(
-        '-v', '--version',
-        help='version of EBCLI to install'
-    )
+    parser.add_argument("-v", "--version", help="version of EBCLI to install")
 
     arguments = parser.parse_args()
 
     if arguments.version and arguments.ebcli_source:
         raise ArgumentError(
             '"--version" and "--ebcli-source" cannot be used together '
-            'because they represent two distinct sources of the EBCLI.'
+            "because they represent two distinct sources of the EBCLI."
         )
     return arguments
 
@@ -811,16 +791,20 @@ def _pip_executable_found(quiet):
     `pip<x.y>` but not as `pip<x>`
     :return: True/False
     """
-    pip_executables = ['pip', 'pip2', 'pip3']
-    if sys.platform.startswith('win32'):
+    pip_executables = ["pip", "pip2", "pip3"]
+    if sys.platform.startswith("win32"):
         pip_executables += [
-            'pip.exe', 'pip2.exe', 'pip3.exe',
-            'pip.cmd', 'pip2.cmd', 'pip3.cmd',
+            "pip.exe",
+            "pip2.exe",
+            "pip3.exe",
+            "pip.cmd",
+            "pip2.cmd",
+            "pip3.cmd",
         ]
     for executable in pip_executables:
         if _executable_found(executable, quiet):
             if not quiet:
-                print('Found {}'.format(executable))
+                print("Found {}".format(executable))
             return True
 
 
@@ -834,7 +818,7 @@ def _powershell_script_body(virtualenv_location):
                           created.
     :return: None
     """
-    return EXECUTABLE_WRAPPERS['ps1'].format(
+    return EXECUTABLE_WRAPPERS["ps1"].format(
         bin_location=_original_eb_location(virtualenv_location)
     )
 
@@ -849,32 +833,28 @@ def _python_script_body(virtualenv_location):
                           created.
     :return: None
     """
-    return EXECUTABLE_WRAPPERS['py'].format(
+    return EXECUTABLE_WRAPPERS["py"].format(
         bin_location=_original_eb_location(virtualenv_location)
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _ensure_not_inside_virtualenv_to_begin_with()
     arguments_context = _parse_arguments()
     virtualenv = (
-        arguments_context.virtualenv_executable
-        or _locate_virtualenv_executable()
+        arguments_context.virtualenv_executable or _locate_virtualenv_executable()
     )
     virtualenv_location = _create_virtualenv(
         virtualenv,
         arguments_context.location,
         arguments_context.python_installation,
-        arguments_context.quiet
+        arguments_context.quiet,
     )
     _activate_virtualenv(virtualenv_location)
     _install_ebcli(
         arguments_context.quiet,
         arguments_context.version,
-        arguments_context.ebcli_source
+        arguments_context.ebcli_source,
     )
     _generate_ebcli_wrappers(virtualenv_location)
-    _announce_success(
-        virtualenv_location,
-        arguments_context.hide_export_recommendation
-    )
+    _announce_success(virtualenv_location, arguments_context.hide_export_recommendation)

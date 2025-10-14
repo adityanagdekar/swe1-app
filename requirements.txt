@@ -1,9 +1,15 @@
 asgiref==3.9.2
 black==25.9.0
+certifi==2025.10.5
+charset-normalizer==3.4.3
 click==8.3.0
+coverage==7.10.7
+coveralls==4.0.1
 Django==5.2.6
+docopt==0.6.2
 flake8==7.3.0
 gunicorn==23.0.0
+idna==3.11
 mccabe==0.7.0
 mypy_extensions==1.1.0
 packaging==25.0
@@ -12,4 +18,6 @@ platformdirs==4.5.0
 pycodestyle==2.14.0
 pyflakes==3.4.0
 pytokens==0.1.10
+requests==2.32.5
 sqlparse==0.5.3
+urllib3==2.5.0
